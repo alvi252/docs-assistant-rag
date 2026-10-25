@@ -1,0 +1,89 @@
+# Labelled questions for `python -m docs_assistant.eval`.
+#
+# expected_sources: documents that contain the answer (retrieval hit = any of them retrieved).
+# expected_facts:   each entry is a group of acceptable spellings; a group counts as present
+#                   when any alternative appears in the answer (case- and dash-insensitive).
+# answerable:false  the documents do NOT contain the answer; the assistant must say so.
+
+questions:
+  - id: q01
+    question: How long does standard delivery to Germany take, and how much does it cost?
+    expected_sources: [shipping-and-delivery.md]
+    expected_facts:
+      - ["3-5", "3 to 5"]
+      - ["6.90"]
+
+  - id: q02
+    question: Can I return an unopened bag of cat food, and how long do I have?
+    expected_sources: [returns-and-refunds.md]
+    expected_facts:
+      - ["30 days", "30-day"]
+
+  - id: q03
+    question: My dog refuses the PawPantry Kitchen food I opened last week. Can I get my money back?
+    expected_sources: [returns-and-refunds.md]
+    expected_facts:
+      - ["half"]
+      - ["14 days"]
+
+  - id: q04
+    question: If I pay by bank transfer, how long do you hold my order and when does it ship?
+    expected_sources: [payment-methods.md]
+    expected_facts:
+      - ["7 calendar days", "7 days", "seven days"]
+      - ["1-2 business days", "1 to 2 business days", "one to two business days"]
+
+  - id: q05
+    question: How do I skip or pause my Autoship, and what is the deadline for changes?
+    expected_sources: [subscription-orders.md]
+    expected_facts:
+      - ["23:59"]
+      - ["6 months", "six months"]
+
+  - id: q06
+    question: How often should I replace the filter in the AquaFlow fountain? I have two cats.
+    expected_sources: [care-guide-fountain-and-feeder.md]
+    expected_facts:
+      - ["2 weeks", "two weeks"]
+
+  - id: q07
+    question: How much dry food should my 10 kg adult dog eat per day?
+    expected_sources: [feeding-guide-dry-food.md]
+    expected_facts:
+      - ["160"]
+
+  - id: q08
+    question: My SmartBowl feeder stopped working 18 months after delivery. Is it still covered?
+    expected_sources: [product-warranty.md]
+    expected_facts:
+      - ["2-year", "2 years", "two years", "2 year", "two-year"]
+
+  - id: q09
+    question: Can I chat with you on Saturdays, and until what time?
+    expected_sources: [contact-and-opening-hours.md]
+    expected_facts:
+      - ["17:00", "5 pm", "5:00 pm", "5pm"]
+
+  - id: q10
+    question: Combien de temps ai-je pour retourner un article ?
+    expected_sources: [returns-and-refunds.md]
+    expected_facts:
+      - ["30 jours", "30 days"]
+
+  - id: q11
+    question: What is the heavy-order surcharge for a 25 kg order shipped to Spain?
+    expected_sources: [shipping-and-delivery.md]
+    expected_facts:
+      - ["€10", "10 €", "EUR 10", "10 euros"]
+
+  - id: q12
+    question: Do you offer pet insurance?
+    answerable: false
+
+  - id: q13
+    question: Which vaccinations does a kitten need, and at what age?
+    answerable: false
+
+  - id: q14
+    question: Who founded PawPantry, and in which year?
+    answerable: false
