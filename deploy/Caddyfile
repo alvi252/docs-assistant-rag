@@ -1,0 +1,8 @@
+# SITE_ADDRESS is ":80" (plain HTTP) until you set a domain in deploy/.env;
+# a domain name makes Caddy fetch and renew an HTTPS certificate on its own.
+{$SITE_ADDRESS} {
+	basic_auth {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
+	reverse_proxy app:8000
+}
