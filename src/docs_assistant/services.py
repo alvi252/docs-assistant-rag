@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .answering import DocsAssistant
 from .cache import CachedEmbedder
@@ -10,6 +10,7 @@ from .config import Settings
 from .embeddings import EmbeddingProvider, build_embedding_provider
 from .ingest import Ingestor
 from .llm import LLMProvider, build_llm_provider
+from .questionlog import QuestionLog
 from .retrieval import Retriever
 from .store import Store
 from .usage import UsageLog
@@ -23,6 +24,7 @@ class Services:
     ingestor: Ingestor
     retriever: Retriever
     assistant: DocsAssistant
+    question_log: QuestionLog = field(default_factory=lambda: QuestionLog(None))
 
 
 def build_ingestor(
@@ -70,4 +72,5 @@ def build_services(
         temperature=settings.temperature,
         usage_log=embedder.usage_log,
     )
-    return Services(settings, store, embedder, ingestor, retriever, assistant)
+    question_log = QuestionLog(settings.question_log_path)
+    return Services(settings, store, embedder, ingestor, retriever, assistant, question_log)

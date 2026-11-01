@@ -60,10 +60,12 @@ class Settings:
     # Operations
     admin_token: str = field(default="", repr=False)
     usage_log_path: Path | None = None
+    question_log_path: Path | None = None
 
     @classmethod
     def from_env(cls) -> Settings:
         usage_log = os.environ.get("USAGE_LOG_PATH", "").strip()
+        question_log = os.environ.get("QUESTION_LOG_PATH", "").strip()
         provider = _env_str("LLM_PROVIDER", cls.llm_provider).lower()
         default_model = cls.llm_model if provider == "openai" else "claude-haiku-5-5"
         return cls(
@@ -84,6 +86,7 @@ class Settings:
             temperature=_env_float("TEMPERATURE", cls.temperature),
             admin_token=os.environ.get("ADMIN_TOKEN", "").strip(),
             usage_log_path=Path(usage_log) if usage_log else None,
+            question_log_path=Path(question_log) if question_log else None,
         )
 
 

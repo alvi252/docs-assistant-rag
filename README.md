@@ -29,7 +29,7 @@ This assistant is built around three rules:
 - **FastAPI** service: `POST /ask`, `POST /ingest` (optionally protected by an admin token), `GET /documents`, `GET /health`, OpenAPI docs at `/docs`, security headers (strict CSP).
 - **Single-page chat UI** in vanilla HTML/CSS/JS served by FastAPI (no build step, self-hosted font, no third-party requests): clickable citation chips that expand the source passage, and a sources panel with similarity scores.
 - **Evaluation harness** (`python -m docs_assistant.eval`): retrieval hit-rate@k, MRR, refusal correctness, expected facts in the answer, citation correctness, latency and cost, written as Markdown, JSON and a styled HTML page.
-- **Quality**: type hints (`mypy` clean), `ruff` clean, 85 tests (79 pytest tests + 6 doctests) using fake providers — **no network access in tests**.
+- **Quality**: type hints (`mypy` clean), `ruff` clean, 97 tests (89 pytest tests + 8 doctests) using fake providers — **no network access in tests**.
 
 ## Architecture
 
@@ -126,7 +126,7 @@ pytest && ruff check . && mypy     # tests run offline with fake providers
 
 **Offline mode:** `EMBEDDING_PROVIDER=hashing` uses a deterministic bag-of-words embedder (no API, no semantics). It is meant for tests and demos without a key; answers still need an LLM provider.
 
-**Docker** (a `Dockerfile` is included; it was not built as part of this demo run):
+**Docker** (the image builds and runs; for a password-protected setup with HTTPS see [`deploy/`](deploy/README.md)):
 
 ```bash
 docker build -t docs-assistant .
@@ -191,6 +191,7 @@ All settings are environment variables (see [`.env.example`](.env.example)):
 | `MAX_ANSWER_TOKENS` / `TEMPERATURE` | `500` / `0` | Generation |
 | `ADMIN_TOKEN` | empty | Protects `POST /ingest` when set |
 | `USAGE_LOG_PATH` | empty | JSONL log of tokens and cost per paid call (no prompts, no keys) |
+| `QUESTION_LOG_PATH` | empty | JSONL log of the questions asked through `/ask` (off when empty); questions may contain personal data, so the file stays on your own server. Read it with `docs-assistant questions [--refused]` |
 
 ## Adapting it to a client's documents
 
@@ -204,7 +205,7 @@ The pipeline only needs text with headings. Getting a client's content into `DOC
 | **Notion** | Read pages through the Notion API and map heading blocks to `#`/`##`; one file per page keeps citations readable. |
 | **Help desk / FAQ exports** | One Markdown file per category, one `##` per question. |
 
-Other things that typically change for a real deployment: the company name and refusal wording (`COMPANY_NAME`, `answering.py`), the eval set (20–50 real customer questions with expected sources is enough to catch regressions), authentication and rate limiting on `/ask`, and — beyond tens of thousands of chunks — swapping `store.py` for pgvector or a dedicated vector database behind the same methods.
+Other things that typically change for a real deployment: the company name and refusal wording (`COMPANY_NAME`, `answering.py`), the eval set (20–50 real customer questions with expected sources is enough to catch regressions), authentication (see `deploy/`) and rate limiting on `/ask`, and — beyond tens of thousands of chunks — swapping `store.py` for pgvector or a dedicated vector database behind the same methods.
 
 ## Cost notes
 
@@ -221,7 +222,7 @@ Measured on this demo (token counts from the API responses; prices from the tabl
 - Hit-rate in the eval is document-level; see "What the eval caught" above.
 - The language detection for the canned refusal message is a small stopword vote (EN/FR/DE/ES/IT/NL); generated answers follow the question's language via the model.
 - The Anthropic adapter is unit-tested against a stub client but was not exercised live here.
-- No authentication or rate limiting on `/ask` in this demo; add both before exposing it publicly.
+- No authentication or rate limiting on `/ask` in the app itself. [`deploy/`](deploy/README.md) puts a password in front of it (Caddy `basic_auth`); rate limiting is not included.
 
 ## Project layout
 
@@ -230,6 +231,7 @@ src/docs_assistant/   application package (see the module table above)
   static/             chat UI (index.html, app.css, app.js), eval report CSS, Inter font (OFL)
 data/docs/            fictional PawPantry knowledge base (8 Markdown documents)
 eval/                 questions.yaml + report.md / report.json / report.html from the live run
+deploy/               docker compose + Caddy: password-protected chat, HTTPS, index volume
 tests/                pytest suite (fake embedding and LLM providers, no network)
 assets/screenshots/   screenshots from the live run
 ```

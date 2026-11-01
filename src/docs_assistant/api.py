@@ -188,6 +188,7 @@ def create_app(settings: Settings | None = None, *, services: Services | None = 
             raise HTTPException(
                 status_code=502, detail="The AI provider is unavailable. Please retry shortly."
             ) from exc
+        svc.question_log.record(result)
         return AskResponse.model_validate(result.to_dict())
 
     @app.post("/ingest", response_model=IngestResponse, dependencies=[Depends(require_admin)])
